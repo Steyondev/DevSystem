@@ -1,0 +1,7 @@
+name: DevSystem
+version: '1.0'
+main: de.steyon.devSystem.DevSystem
+api-version: '1.21'
+authors: [ SteyOn ]
+description: Official SteyOn Developer System for Minecraft Servers
+website: https://github.com/SteyOn

@@ -1,0 +1,23 @@
+# DevSystem Configuration
+# Official SteyOn Developer System for Minecraft Servers
+# This plugin provides essential development tools and utilities
+# for server administrators and developers to streamline workflows
+# and enhance productivity in Minecraft server environments.
+
+# Config version - DO NOT MODIFY!
+config-version: 1
+
+# Message Settings
+messages:
+  # Plugin prefix - Used in all messages
+  prefix: "<bold><gradient:green:blue>DevSystem</gradient></bold> <dark_gray>»</dark_gray> "
+  
+  # Plugin Messages
+  plugin:
+    enabled: "<prefix><white>Plugin has been <green>enabled</green>!</white>"
+    disabled: "<prefix><white>Plugin has been <red>disabled</red>!</white>"
+    checking-updates: "<prefix><white>Checking for updates...</white>"
+    starting: "<prefix><white>Starting DevSystem...</white>"
+    config-loaded: "<prefix><white>Configuration has been <green>loaded</green>!</white>"
+    
+  # Other messages will be defined here in the future
