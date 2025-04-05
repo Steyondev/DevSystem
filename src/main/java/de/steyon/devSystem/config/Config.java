@@ -87,13 +87,27 @@ public class Config {
         messageDefaults.put("no-permission", "<prefix><red>You don't have permission to use this command!</red>");
         
         // Plugin message defaults
-        Map<String, Object> pluginDefaults = new HashMap<>();
+        Map<String, String> pluginDefaults = new HashMap<>();
         pluginDefaults.put("enabled", "<prefix><white>Plugin has been <green>enabled</green>!</white>");
         pluginDefaults.put("disabled", "<prefix><white>Plugin has been <red>disabled</red>!</white>");
         pluginDefaults.put("checking-updates", "<prefix><white>Checking for updates...</white>");
         pluginDefaults.put("starting", "<prefix><white>Starting DevSystem...</white>");
         pluginDefaults.put("config-loaded", "<prefix><white>Configuration has been <green>loaded</green>!</white>");
         messageDefaults.put("plugin", pluginDefaults);
+
+        // Error message defaults
+        Map<String, String> errorDefaults = new HashMap<>();
+        errorDefaults.put("config-loaded", "<prefix><white>Configuration has been <green>loaded</green>!</white>");
+        errorDefaults.put("folder-created", "<prefix><gray>Folder <aqua>{name}</aqua> <gray>created successfully.");
+        errorDefaults.put("folder-exists", "<prefix><gray>Folder <aqua>{name}</aqua> <gray>already exists.");
+        errorDefaults.put("folder-deleted", "<prefix><gray>Folder <aqua>{name}</aqua> <gray>deleted successfully.");
+        errorDefaults.put("folder-not-exist", "<prefix><gray>Folder <aqua>{name}</aqua> <gray>does not exist.");
+        errorDefaults.put("folder-delete-fail", "<prefix><gray>Failed to delete folder <aqua>{name}</aqua>.");
+
+        errorDefaults.put("file-deleted", "<prefix><gray>File <aqua>{name}</aqua> <gray>deleted successfully.");
+        errorDefaults.put("file-delete-fail", "<prefix><gray>Failed to delete file <aqua>{name}</aqua>.");
+        errorDefaults.put("file-not-exist", "<prefix><gray>File <aqua>{name}</aqua> <gray>does not exist.");
+        messageDefaults.put("error", errorDefaults);
         
         // Register all defaults
         defaultValues.put("messages", messageDefaults);
@@ -145,7 +159,7 @@ public class Config {
     private void migrateConfig(int fromVersion) {
         // Example migration logic for future use
         if (fromVersion < 2) {
-            // Migrate from v1 to v2
+            // Migrate from v1 to v2name
             // mainConfig.set("new-section.new-value", "value");
         }
         
@@ -494,4 +508,43 @@ public class Config {
         
         return List.copyOf(section.getKeys(deep));
     }
+
+
+    public Map<String, Object> getMessages() {
+        return defaultValues.get("messages");
+    }
+    
+    /**
+     * Gets a message with placeholders
+     * @param category
+     * @param key
+     * @param placeholders
+     * @return
+     */
+    public String getMessage(String category, String key, String... placeholders) {
+        String message = ((HashMap<String, String>) getMessages().get(category)).getOrDefault(key, "<red>Message not found: " + key + "</red>");
+        message = message.replace("<prefix>", getPrefix());
+
+        if (placeholders != null) {
+            String placeholderKey = getPlaceholderKey(category);
+            for (String placeholder : placeholders) {
+                message = message.replace("{" + placeholderKey + "}", placeholder);
+            }
+        }
+
+        return message;
+    }
+
+    /**
+     * Gets the placeholder key for a given category
+     * @param category Category name
+     * @return Placeholder key
+     */
+    private String getPlaceholderKey(String category) {
+        return switch(category) {
+            case "error", "plugin" -> "name";
+            default -> throw new IllegalStateException("Unexpected value: " + category);
+        };
+    }
+
 } 
