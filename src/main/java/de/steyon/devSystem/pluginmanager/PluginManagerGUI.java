@@ -11,6 +11,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.RegisteredListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -212,11 +214,8 @@ public class PluginManagerGUI {
         String descriptionText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-description", "<gray>Description: <green>{description}</green>")
             .replace("{description}", desc);
         
-        String enabledText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.status-enabled", "<green>Enabled</green>");
-        String disabledText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.status-disabled", "<red>Disabled</red>");
-        
         String statusText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-status", "<gray>Status: {status}")
-            .replace("{status}", targetPlugin.isEnabled() ? enabledText : disabledText);
+            .replace("{status}", targetPlugin.isEnabled() ? "<green>Enabled</green>" : "<red>Disabled</red>");
         
         String commandsFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-commands", "<gray>Commands: <green>{commands}</green>");
         StringBuilder commandsBuilder = new StringBuilder();
@@ -265,6 +264,30 @@ public class PluginManagerGUI {
             "<gray>Main Class: <green>{mainclass}</green>");
         String mainClassText = mainClassFormat.replace("{mainclass}", targetPlugin.getDescription().getMain());
         
+        String eventsFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-events", 
+            "<gray>Events Listener: <green>{events}</green>");
+        
+        StringBuilder eventsBuilder = new StringBuilder();
+        
+        try {
+            List<String> listenerClasses = new ArrayList<>();
+            
+            for (RegisteredListener listener : HandlerList.getRegisteredListeners(targetPlugin)) {
+                String listenerClass = listener.getListener().getClass().getSimpleName();
+                if (!listenerClass.isEmpty() && !listenerClasses.contains(listenerClass)) {
+                    listenerClasses.add(listenerClass);
+                }
+            }
+            
+            if (!listenerClasses.isEmpty()) {
+                eventsBuilder.append(String.join(", ", listenerClasses));
+            }
+        } catch (Exception e) {
+        }
+        
+        String eventsText = eventsFormat.replace("{events}", 
+            eventsBuilder.length() > 0 ? eventsBuilder.toString() : "None");
+        
         ItemBuilder infoBuilder = new ItemBuilder(Material.BOOK)
             .name(miniMessage.deserialize(pluginNameText))
             .lore(
@@ -276,7 +299,8 @@ public class PluginManagerGUI {
                 miniMessage.deserialize(dependenciesText),
                 miniMessage.deserialize(softDependenciesText),
                 miniMessage.deserialize(websiteText),
-                miniMessage.deserialize(mainClassText)
+                miniMessage.deserialize(mainClassText),
+                miniMessage.deserialize(eventsText)
             )
             .clearAllAttributes();
             

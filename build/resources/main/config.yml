@@ -10,15 +10,15 @@ config-version: 1
 # Message Settings
 messages:
   # Plugin prefix - Used in all messages
-  prefix: "<red><bold>DevSystem</bold> <dark_gray>»</dark_gray> "
+  prefix: "<b><gradient:#003CD6:#00A2FF>DEVSYSTEM</gradient></b> <dark_gray>»</dark_gray> "
   
   # Plugin Messages
   plugin:
-    enabled: "<prefix><white>Plugin has been <green>enabled<dark_gray>!</white>"
-    disabled: "<prefix><white>Plugin has been <red>disabled<dark_gray>!</white>"
-    checking-updates: "<prefix><white>Checking for updates<dark_gray>...</white>"
-    starting: "<prefix><white>Starting DevSystem<dark_gray>...</white>"
-    config-loaded: "<prefix><white>Configuration has been <green>loaded<dark_gray>!</white>"
+    enabled: "<prefix><gray>Plugin has been </gray><green>enabled<dark_gray>!</dark_gray>"
+    disabled: "<prefix><gray>Plugin has been </gray><red>disabled<dark_gray>!</dark_gray>"
+    checking-updates: "<prefix><gray>Checking for updates</gray><dark_gray>...</dark_gray>"
+    starting: "<prefix><gray>Starting DevSystem</gray><dark_gray>...</dark_gray>"
+    config-loaded: "<prefix><gray>Configuration has been </gray><green>loaded<dark_gray>!</dark_gray>"
   
   # Permission errors
   no-permission: "<prefix><red>You don't have permission to use this command<dark_gray>!</red>"
@@ -33,12 +33,12 @@ messages:
 # Plugin Manager Settings
 plugin-manager:
   # GUI titles
-  main-gui-title: "<red><bold>Modules</bold> <dark_gray>• Übersicht"
-  details-gui-title: "<red><bold>Module</bold> <dark_gray>• {plugin}"
-  help-title: "<red><bold>Plugin Manager Help</bold>"
+  main-gui-title: "<aqua><bold>Plugins</bold> <dark_gray>• Übersicht"
+  details-gui-title: "<aqua><bold>Plugin</bold> <dark_gray>• {plugin}"
+  help-title: "<aqua><bold>Plugin Manager Help</bold>"
   
   # Plugin items in GUI
-  plugin-name: "<red>{plugin}"
+  plugin-name: "<aqua>{plugin}"
   plugin-version: "<dark_gray>➥<gray> Version<dark_gray>: <green>{version}</green>"
   plugin-author: "<dark_gray>➥<gray> Author<dark_gray>: <green>{author}</green>"
   plugin-description: "<dark_gray>➥<gray> Description<dark_gray>: <green>{description}</green>"
@@ -53,6 +53,7 @@ plugin-manager:
   plugin-soft-dependencies: "<dark_gray>➥<gray> Soft Dependencies<dark_gray>: <green>{softdependencies}</green>"
   plugin-website: "<dark_gray>➥<gray> Website<dark_gray>: <green>{website}</green>"
   plugin-main-class: "<dark_gray>➥<gray> Main Class<dark_gray>: <green>{mainclass}</green>"
+  plugin-events: "<dark_gray>➥<gray> Event Listeners<dark_gray>: <green>{events}</green>"
 
   # Navigation buttons
   prev-page: "<dark_gray>« <blue>Previous Page</blue>"
@@ -62,16 +63,16 @@ plugin-manager:
   # Action buttons
   reload-text: "<yellow>Reload Plugin</yellow>"
   reload-lore: "<dark_gray>» <gray>Click to reload this plugin"
-  enable-text: "<green>Module aktivieren</green>"
+  enable-text: "<green>Plugin aktivieren</green>"
   enable-lore: "<dark_gray>» <gray>Click to enable this plugin"
-  disable-text: "<red>Module deaktivieren</red>"
+  disable-text: "<red>Plugin deaktivieren</red>"
   disable-lore: "<dark_gray>» <gray>Click to disable this plugin"
   
   # Plugin Manager messages
-  plugin-enabled: "<prefix>Das Modul <red>{plugin}</red> wurde <green>aktiviert<dark_gray>!"
-  plugin-disabled: "<prefix>Das Modul <red>{plugin}</red> wurde <red>deaktiviert<dark_gray>!"
-  plugin-reloaded: "<prefix>The plugin <yellow>{plugin}</yellow> has been <yellow>reloaded<dark_gray>!</white>"
-  plugin-not-enabled: "<prefix><red>Plugin is not enabled<dark_gray>!</red>"
+  plugin-enabled: "<prefix><gray>The Plugin </gray><aqua>{plugin}</aqua><gray> has been </gray><green>enabled<dark_gray>!"
+  plugin-disabled: "<prefix><gray>The Plugin </gray><aqua>{plugin}</aqua><gray> has been </gray><red>disabled<dark_gray>!"
+  plugin-reloaded: "<prefix><gray>The plugin </gray><yellow>{plugin}</yellow><gray> has been </gray><yellow>reloaded<dark_gray>!"
+  plugin-not-enabled: "<prefix><red>Plugin is not enabled<dark_gray>!"
   plugin-already-enabled: "<prefix><red>Plugin is already enabled<dark_gray>: {plugin}</red>"
   plugin-already-disabled: "<prefix><red>Plugin is already disabled<dark_gray>: {plugin}</red>"
   cannot-disable-self: "<prefix><red>You cannot disable this plugin<dark_gray>!</red>"
@@ -93,7 +94,7 @@ plugin-manager:
     reload: "<dark_gray>» <gray>/plugmanager reload <blue><plugin>"
   
   # Info command
-  info-header: "<red><bold>Plugin Information</bold><dark_gray>: {plugin}"
+  info-header: "<aqua><bold>Plugin Information</bold><dark_gray>: {plugin}"
   info-name: "<dark_gray>➥<gray> Name<dark_gray>: <green>{name}</green>"
   info-version: "<dark_gray>➥<gray> Version<dark_gray>: <green>{version}</green>"
   info-authors: "<dark_gray>➥<gray> Author(s)<dark_gray>: <green>{authors}</green>"
@@ -101,7 +102,7 @@ plugin-manager:
   info-status: "<dark_gray>➥<gray> Status<dark_gray>: {status}"
   
   # List command
-  list-header: "<red><bold>Plugin List</bold> <dark_gray>({enabled}/{total})"
+  list-header: "<aqua><bold>Plugin List</bold> <dark_gray>({enabled}/{total})"
   list-format-enabled: "<green>{plugin}</green>"
   list-format-disabled: "<red>{plugin}</red>"
   list-separator: "<dark_gray>, </dark_gray>"

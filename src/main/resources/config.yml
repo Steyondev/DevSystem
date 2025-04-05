@@ -53,6 +53,7 @@ plugin-manager:
   plugin-soft-dependencies: "<dark_gray>➥<gray> Soft Dependencies<dark_gray>: <green>{softdependencies}</green>"
   plugin-website: "<dark_gray>➥<gray> Website<dark_gray>: <green>{website}</green>"
   plugin-main-class: "<dark_gray>➥<gray> Main Class<dark_gray>: <green>{mainclass}</green>"
+  plugin-events: "<dark_gray>➥<gray> Event Listeners<dark_gray>: <green>{events}</green>"
 
   # Navigation buttons
   prev-page: "<dark_gray>« <blue>Previous Page</blue>"
