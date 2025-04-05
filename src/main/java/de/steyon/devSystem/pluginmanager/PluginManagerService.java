@@ -1,4 +1,4 @@
-package de.steyon.devSystem.api.pluginmanager;
+package de.steyon.devSystem.pluginmanager;
 
 import de.steyon.devSystem.DevSystem;
 import org.bukkit.Bukkit;

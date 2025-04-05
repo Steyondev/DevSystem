@@ -1,12 +1,12 @@
-package de.steyon.devSystem.api.pluginmanager;
+package de.steyon.devSystem.pluginmanager;
 
 import de.steyon.devSystem.DevSystem;
-import de.steyon.devSystem.api.pluginmanager.commands.EnableCommand;
-import de.steyon.devSystem.api.pluginmanager.commands.DisableCommand;
-import de.steyon.devSystem.api.pluginmanager.commands.InfoCommand;
-import de.steyon.devSystem.api.pluginmanager.commands.ListCommand;
-import de.steyon.devSystem.api.pluginmanager.commands.ReloadCommand;
-import de.steyon.devSystem.api.pluginmanager.commands.SubCommand;
+import de.steyon.devSystem.pluginmanager.commands.DisableCommand;
+import de.steyon.devSystem.pluginmanager.commands.EnableCommand;
+import de.steyon.devSystem.pluginmanager.commands.InfoCommand;
+import de.steyon.devSystem.pluginmanager.commands.ListCommand;
+import de.steyon.devSystem.pluginmanager.commands.ReloadCommand;
+import de.steyon.devSystem.pluginmanager.commands.SubCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 

@@ -1,7 +1,8 @@
-package de.steyon.devSystem.api.pluginmanager.commands;
+package de.steyon.devSystem.pluginmanager.commands;
 
 import de.steyon.devSystem.DevSystem;
-import de.steyon.devSystem.api.pluginmanager.PluginManagerService;
+import de.steyon.devSystem.pluginmanager.PluginManagerService;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -10,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EnableCommand implements SubCommand {
+public class InfoCommand implements SubCommand {
 
     private final DevSystem plugin;
     private final PluginManagerService service;
     private final MiniMessage miniMessage;
     
-    public EnableCommand(DevSystem plugin, PluginManagerService service) {
+    public InfoCommand(DevSystem plugin, PluginManagerService service) {
         this.plugin = plugin;
         this.service = service;
         this.miniMessage = plugin.getMiniMessage();
@@ -24,30 +25,31 @@ public class EnableCommand implements SubCommand {
 
     @Override
     public String getName() {
-        return "enable";
+        return "info";
     }
 
     @Override
     public String getDescription() {
-        return plugin.getConfigManager().getValue("config.yml", "plugin-manager.command-help.enable", "Enables a plugin");
+        return plugin.getConfigManager().getValue("config.yml", "plugin-manager.command-help.info", "Shows information about a plugin");
     }
 
     @Override
     public String getPermission() {
-        return "devsystem.pluginmanager.enable";
+        return "devsystem.pluginmanager.info";
     }
 
     @Override
     public List<String> getAliases() {
         List<String> aliases = new ArrayList<>();
-        aliases.add("on");
+        aliases.add("i");
+        aliases.add("show");
         return aliases;
     }
 
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 1) {
-            String usage = plugin.getConfigManager().getValue("config.yml", "plugin-manager.command-usage.enable", "/plugmanager enable <plugin>");
+            String usage = plugin.getConfigManager().getValue("config.yml", "plugin-manager.command-usage.info", "/plugmanager info <plugin>");
             player.sendMessage(miniMessage.deserialize(
                 plugin.getConfigManager().getValue("config.yml", "messages.command.usage", "<prefix><red>Usage: {usage}</red>")
                     .replace("{usage}", usage)
@@ -66,22 +68,13 @@ public class EnableCommand implements SubCommand {
             return;
         }
         
-        if (target.isEnabled()) {
-            player.sendMessage(miniMessage.deserialize(
-                plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-already-enabled", "<prefix><red>Plugin is already enabled: {plugin}</red>")
-                    .replace("{plugin}", pluginName)
-            ));
-            return;
-        }
-        
-        service.enablePlugin(target, player);
+        service.showPluginInfo(target, player);
     }
     
     @Override
     public List<String> tabComplete(Player player, String[] args) {
         if (args.length == 1) {
             return service.getPlugins().stream()
-                .filter(p -> !p.isEnabled())
                 .map(Plugin::getName)
                 .collect(Collectors.toList());
         }

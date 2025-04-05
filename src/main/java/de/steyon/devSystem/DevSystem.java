@@ -1,9 +1,9 @@
 package de.steyon.devSystem;
 
 import de.steyon.devSystem.api.inv.controller.InventoryManager;
-import de.steyon.devSystem.api.pluginmanager.PluginManagerCommand;
-import de.steyon.devSystem.api.pluginmanager.PluginManagerService;
 import de.steyon.devSystem.config.Config;
+import de.steyon.devSystem.pluginmanager.PluginManagerCommand;
+import de.steyon.devSystem.pluginmanager.PluginManagerService;
 import lombok.Getter;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;

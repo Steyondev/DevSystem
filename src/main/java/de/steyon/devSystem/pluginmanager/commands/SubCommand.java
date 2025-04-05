@@ -1,4 +1,4 @@
-package de.steyon.devSystem.api.pluginmanager.commands;
+package de.steyon.devSystem.pluginmanager.commands;
 
 import org.bukkit.entity.Player;
 

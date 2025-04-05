@@ -1,7 +1,8 @@
-package de.steyon.devSystem.api.pluginmanager.commands;
+package de.steyon.devSystem.pluginmanager.commands;
 
 import de.steyon.devSystem.DevSystem;
-import de.steyon.devSystem.api.pluginmanager.PluginManagerService;
+import de.steyon.devSystem.pluginmanager.PluginManagerService;
+
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
