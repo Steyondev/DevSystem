@@ -366,6 +366,11 @@ public class Config {
         
         Object value = configuration.get(path, defaultValue);
         
+        // Replace prefix placeholder if value is a string
+        if (value instanceof String) {
+            value = ((String) value).replace("<prefix>", prefix);
+        }
+        
         // Cache the result
         valueCache.put(cacheKey, value);
         

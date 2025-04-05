@@ -10,7 +10,7 @@ config-version: 1
 # Message Settings
 messages:
   # Plugin prefix - Used in all messages
-  prefix: "<gradient:green:blue>DevSystem</gradient> <gray>»</gray> "
+  prefix: "<red><bold>DevSystem</bold> <dark_gray>»</dark_gray> "
   
   # Plugin Messages
   plugin:

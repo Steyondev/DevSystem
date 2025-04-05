@@ -19,7 +19,6 @@ public class ActiveItem {
     }
 
     public ActiveItem click(Consumer<InventoryClickEvent> action) {
-        System.out.println(this.hashCode() + " " + "activeItemHashCodeInActiveItemClass" + this.itemStack.getType().name());
         this.action = action;
         return this;
     }

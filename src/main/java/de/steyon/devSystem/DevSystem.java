@@ -1,6 +1,8 @@
 package de.steyon.devSystem;
 
 import de.steyon.devSystem.api.inv.controller.InventoryManager;
+import de.steyon.devSystem.api.pluginmanager.PluginManagerCommand;
+import de.steyon.devSystem.api.pluginmanager.PluginManagerService;
 import de.steyon.devSystem.config.Config;
 import lombok.Getter;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -20,21 +22,32 @@ public final class DevSystem extends JavaPlugin {
     private Config configManager;
     @Getter
     private MiniMessage miniMessage;
+    
+    @Getter
+    private PluginManagerService pluginManagerService;
 
     @Override
     public void onEnable() {
-
-        getServer().getConsoleSender().sendMessage(this.configManager.getPluginMessage("starting"));
-        
         this.configManager = new Config(this);
+        
+        getServer().getConsoleSender().sendMessage(this.configManager.getPluginMessage("starting"));
         getServer().getConsoleSender().sendMessage(this.configManager.getPluginMessage("config-loaded"));
         
         this.inventoryManager = new InventoryManager(this, new HashMap<>());
         this.miniMessage = MiniMessage.builder().postProcessor(postProcessor -> postProcessor.decoration(TextDecoration.ITALIC, false)).build();
+        
+        this.pluginManagerService = new PluginManagerService(this);
 
+        registerCommands();
         checkForUpdates();
         
         getServer().getConsoleSender().sendMessage(this.configManager.getPluginMessage("enabled"));
+    }
+    
+    private void registerCommands() {
+        PluginManagerCommand pluginManagerCommand = new PluginManagerCommand(this, this.pluginManagerService);
+        getCommand("plugmanager").setExecutor(pluginManagerCommand);
+        getCommand("plugmanager").setTabCompleter(pluginManagerCommand);
     }
     
     private void checkForUpdates() {
@@ -44,6 +57,8 @@ public final class DevSystem extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getServer().getConsoleSender().sendMessage(this.configManager.getPluginMessage("disabled"));
+        if (this.configManager != null) {
+            getServer().getConsoleSender().sendMessage(this.configManager.getPluginMessage("disabled"));
+        }
     }
 }
