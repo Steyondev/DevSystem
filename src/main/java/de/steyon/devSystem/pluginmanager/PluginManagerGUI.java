@@ -288,6 +288,39 @@ public class PluginManagerGUI {
         String eventsText = eventsFormat.replace("{events}", 
             eventsBuilder.length() > 0 ? eventsBuilder.toString() : "None");
         
+        String apiFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-api", 
+            "<gray>API: <green>{api}</green>");
+        String apiText = apiFormat.replace("{api}", service.getApiVersion(targetPlugin));
+
+        String loadFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-load", 
+            "<gray>Load: <green>{load}</green>");
+        String loadText = loadFormat.replace("{load}", service.getLoadPhase(targetPlugin));
+
+        String providesFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-provides", 
+            "<gray>Provides: <green>{provides}</green>");
+        String providesJoined = String.join(", ", service.getProvides(targetPlugin));
+        String providesText = providesFormat.replace("{provides}", providesJoined.isEmpty() ? "None" : providesJoined);
+
+        String jarFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-jar", 
+            "<gray>JAR: <green>{path}</green> <gray>({size} bytes)</gray>");
+        String jarText = jarFormat.replace("{path}", service.getJarPath(targetPlugin))
+            .replace("{size}", String.valueOf(Math.max(service.getJarSizeBytes(targetPlugin), 0)));
+
+        String dataFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-datafolder", 
+            "<gray>DataFolder: <green>{path}</green> <gray>({files} files, {size} bytes)</gray>");
+        String dataText = dataFormat
+            .replace("{path}", targetPlugin.getDataFolder() != null ? targetPlugin.getDataFolder().getAbsolutePath() : "-")
+            .replace("{files}", String.valueOf(service.getDataFolderFileCount(targetPlugin)))
+            .replace("{size}", String.valueOf(Math.max(service.getDataFolderSizeBytes(targetPlugin), 0)));
+
+        String listenersCountFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-listeners-count", 
+            "<gray>Listeners: <green>{count}</green>");
+        String listenersCountText = listenersCountFormat.replace("{count}", String.valueOf(service.getListenerCount(targetPlugin)));
+
+        String tasksCountFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-tasks-count", 
+            "<gray>Tasks: <green>{count}</green>");
+        String tasksCountText = tasksCountFormat.replace("{count}", String.valueOf(service.getTaskCount(targetPlugin)));
+        
         ItemBuilder infoBuilder = new ItemBuilder(Material.BOOK)
             .name(miniMessage.deserialize(pluginNameText))
             .lore(
@@ -300,7 +333,14 @@ public class PluginManagerGUI {
                 miniMessage.deserialize(softDependenciesText),
                 miniMessage.deserialize(websiteText),
                 miniMessage.deserialize(mainClassText),
-                miniMessage.deserialize(eventsText)
+                miniMessage.deserialize(eventsText),
+                miniMessage.deserialize(apiText),
+                miniMessage.deserialize(loadText),
+                miniMessage.deserialize(providesText),
+                miniMessage.deserialize(jarText),
+                miniMessage.deserialize(dataText),
+                miniMessage.deserialize(listenersCountText),
+                miniMessage.deserialize(tasksCountText)
             )
             .clearAllAttributes();
             

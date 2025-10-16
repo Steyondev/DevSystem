@@ -11,6 +11,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.io.File;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class PluginManagerService {
 
@@ -31,27 +36,14 @@ public class PluginManagerService {
         this.pluginManagerGUI = new PluginManagerGUI(plugin, this);
     }
     
-    /**
-     * Opens the plugin manager GUI for a player
-     * @param player The player to show the GUI to
-     */
     public void openPluginManagerGUI(Player player) {
         pluginManagerGUI.openMainGUI(player);
     }
     
-    /**
-     * Gets a list of all plugins on the server
-     * @return List of plugins
-     */
     public List<Plugin> getPlugins() {
         return Arrays.asList(pluginManager.getPlugins());
     }
     
-    /**
-     * Gets a plugin by name
-     * @param name The name of the plugin
-     * @return The plugin, or null if not found
-     */
     public Plugin getPlugin(String name) {
         for (Plugin plugin : pluginManager.getPlugins()) {
             if (plugin.getName().equalsIgnoreCase(name)) {
@@ -60,13 +52,128 @@ public class PluginManagerService {
         }
         return null;
     }
-    
-    /**
-     * Enables a plugin
-     * @param target The plugin to enable
-     * @param player The player who triggered the action
-     * @return true if successful, false otherwise
-     */
+
+    public String getApiVersion(Plugin p) {
+        try {
+            String v = p.getDescription().getAPIVersion();
+            return v != null ? v : "unknown";
+        } catch (Throwable t) { return "unknown"; }
+    }
+
+    public String getLoadPhase(Plugin p) {
+        try {
+            return String.valueOf(p.getDescription().getLoad());
+        } catch (Throwable t) { return "POSTWORLD"; }
+    }
+
+    public List<String> getProvides(Plugin p) {
+        try {
+            List<String> provides = p.getDescription().getProvides();
+            return provides != null ? provides : new ArrayList<>();
+        } catch (Throwable t) { return new ArrayList<>(); }
+    }
+
+    public String getJarPath(Plugin p) {
+        try {
+            URL url = p.getClass().getProtectionDomain().getCodeSource().getLocation();
+            if (url == null) return "unknown";
+            String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
+            return path;
+        } catch (Throwable t) { return "unknown"; }
+    }
+
+    public long getJarSizeBytes(Plugin p) {
+        try {
+            File f = new File(getJarPath(p));
+            return f.isFile() ? f.length() : -1L;
+        } catch (Throwable t) { return -1L; }
+    }
+
+    public long getDataFolderSizeBytes(Plugin p) {
+        File dir = p.getDataFolder();
+        return dir != null ? folderSize(dir) : -1L;
+    }
+
+    public int getDataFolderFileCount(Plugin p) {
+        File dir = p.getDataFolder();
+        return dir != null ? fileCount(dir) : 0;
+    }
+
+    private long folderSize(File f) {
+        if (f == null || !f.exists()) return 0L;
+        if (f.isFile()) return f.length();
+        long total = 0L;
+        File[] list = f.listFiles();
+        if (list == null) return 0L;
+        for (File c : list) total += folderSize(c);
+        return total;
+    }
+
+    private int fileCount(File f) {
+        if (f == null || !f.exists()) return 0;
+        if (f.isFile()) return 1;
+        int total = 0;
+        File[] list = f.listFiles();
+        if (list == null) return 0;
+        for (File c : list) total += fileCount(c);
+        return total;
+    }
+
+    public int getListenerCount(Plugin p) {
+        try {
+            int count = 0;
+            for (org.bukkit.plugin.RegisteredListener l : org.bukkit.event.HandlerList.getRegisteredListeners(p)) {
+                if (l.getPlugin() == p) count++;
+            }
+            return count;
+        } catch (Throwable t) { return 0; }
+    }
+
+    public List<String> getListenerClassNames(Plugin p) {
+        List<String> names = new ArrayList<>();
+        try {
+            for (org.bukkit.plugin.RegisteredListener l : org.bukkit.event.HandlerList.getRegisteredListeners(p)) {
+                if (l.getPlugin() == p) {
+                    String n = l.getListener().getClass().getSimpleName();
+                    if (!n.isEmpty() && !names.contains(n)) names.add(n);
+                }
+            }
+        } catch (Throwable ignored) {}
+        return names;
+    }
+
+    public int getTaskCount(Plugin p) {
+        try {
+            return (int) Bukkit.getScheduler().getPendingTasks().stream().filter(t -> t.getOwner() == p).count();
+        } catch (Throwable t) { return 0; }
+    }
+
+    public List<Integer> getTaskIds(Plugin p) {
+        List<Integer> ids = new ArrayList<>();
+        try {
+            Bukkit.getScheduler().getPendingTasks().forEach(t -> { if (t.getOwner() == p) ids.add(t.getTaskId()); });
+        } catch (Throwable ignored) {}
+        return ids;
+    }
+
+    public List<Plugin> getDependents(Plugin target) {
+        List<Plugin> dependents = new ArrayList<>();
+        if (target == null) return dependents;
+        String name = target.getName();
+        for (Plugin p : pluginManager.getPlugins()) {
+            if (p == target) continue;
+            try {
+                List<String> dep = p.getDescription().getDepend();
+                List<String> soft = p.getDescription().getSoftDepend();
+                if ((dep != null && dep.stream().anyMatch(d -> d.equalsIgnoreCase(name))) ||
+                    (soft != null && soft.stream().anyMatch(d -> d.equalsIgnoreCase(name)))) {
+                    dependents.add(p);
+                }
+            } catch (Throwable ignored) {}
+        }
+        return dependents;
+    }
+
     public boolean enablePlugin(Plugin target, Player player) {
         if (target == null || target.isEnabled()) {
             return false;
@@ -85,12 +192,6 @@ public class PluginManagerService {
         return true;
     }
     
-    /**
-     * Disables a plugin
-     * @param target The plugin to disable
-     * @param player The player who triggered the action
-     * @return true if successful, false otherwise
-     */
     public boolean disablePlugin(Plugin target, Player player) {
         if (target == null || !target.isEnabled() || target.equals(plugin)) {
             if (target != null && target.equals(plugin) && player != null) {
@@ -105,7 +206,28 @@ public class PluginManagerService {
         boolean allowDisableCore = plugin.getConfigManager().getValue("config.yml", "plugin-manager.settings.allow-disable-core-plugins", false);
         if (!allowDisableCore && isSystemPlugin(target)) {
             if (player != null) {
-                player.sendMessage(miniMessage.deserialize("<prefix><red>Cannot disable core system plugin: " + target.getName() + "</red>"));
+                player.sendMessage(miniMessage.deserialize(
+                    plugin.getConfigManager().getValue("config.yml", "plugin-manager.cannot-disable-core",
+                        "<prefix><red>Cannot disable core system plugin</red><dark_gray>: </dark_gray><aqua>{plugin}</aqua>")
+                        .replace("{plugin}", target.getName())
+                ));
+            }
+            return false;
+        }
+
+        boolean blockIfDependents = plugin.getConfigManager().getValue("config.yml", "plugin-manager.settings.block-disable-with-dependents", true);
+        List<Plugin> dependents = getDependents(target);
+        if (blockIfDependents && !dependents.isEmpty()) {
+            if (player != null) {
+                String list = dependents.stream().map(Plugin::getName).collect(Collectors.joining(
+                    plugin.getConfigManager().getValue("config.yml", "plugin-manager.list-separator", ", ")
+                ));
+                player.sendMessage(miniMessage.deserialize(
+                    plugin.getConfigManager().getValue("config.yml", "plugin-manager.cannot-disable-has-dependents", 
+                    "<prefix><red>Cannot disable {plugin}, dependents: {dependents}</red>")
+                        .replace("{plugin}", target.getName())
+                        .replace("{dependents}", list.isEmpty() ? "-" : list)
+                ));
             }
             return false;
         }
@@ -123,11 +245,6 @@ public class PluginManagerService {
         return true;
     }
     
-    /**
-     * Checks if a plugin is a core system plugin that shouldn't be disabled
-     * @param plugin The plugin to check
-     * @return true if it's a system plugin
-     */
     private boolean isSystemPlugin(Plugin plugin) {
         String name = plugin.getName().toLowerCase();
         return name.equals("minecraft") || name.equals("bukkit") || 
@@ -135,12 +252,6 @@ public class PluginManagerService {
                name.equals("craftbukkit") || name.equals("purpur");
     }
     
-    /**
-     * Reloads a plugin
-     * @param target The plugin to reload
-     * @param player The player who triggered the action
-     * @return true if successful, false otherwise
-     */
     public boolean reloadPlugin(Plugin target, Player player) {
         if (target == null || !target.isEnabled()) {
             if (player != null) {
@@ -151,9 +262,22 @@ public class PluginManagerService {
             }
             return false;
         }
-        
-        pluginManager.disablePlugin(target);
-        pluginManager.enablePlugin(target);
+        boolean smartReload = plugin.getConfigManager().getValue("config.yml", "plugin-manager.settings.smart-reload", true);
+        if (!smartReload) {
+            pluginManager.disablePlugin(target);
+            pluginManager.enablePlugin(target);
+        } else {
+            List<Plugin> dependents = getDependents(target);
+            dependents.sort((a,b) -> a.getName().compareToIgnoreCase(b.getName()));
+            for (Plugin dep : dependents) {
+                if (dep.isEnabled()) pluginManager.disablePlugin(dep);
+            }
+            pluginManager.disablePlugin(target);
+            pluginManager.enablePlugin(target);
+            for (Plugin dep : dependents) {
+                if (!dep.isEnabled()) pluginManager.enablePlugin(dep);
+            }
+        }
         
         if (player != null) {
             player.sendMessage(miniMessage.deserialize(
@@ -166,11 +290,6 @@ public class PluginManagerService {
         return true;
     }
     
-    /**
-     * Displays plugin information to a player
-     * @param target The plugin to show information about
-     * @param player The player to show the information to
-     */
     public void showPluginInfo(Plugin target, Player player) {
         if (target == null) {
             return;
@@ -198,7 +317,7 @@ public class PluginManagerService {
             plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-version", "<white>Version: <green>{version}</green></white>")
                 .replace("{version}", target.getDescription().getVersion())
         ));
-        
+
         String authorName = "Unknown";
         if (target.getDescription().getAuthors() != null && !target.getDescription().getAuthors().isEmpty()) {
             authorName = String.join(", ", target.getDescription().getAuthors());
@@ -221,12 +340,64 @@ public class PluginManagerService {
             plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-status", "<white>Status: {status}</white>")
                 .replace("{status}", enabledText)
         ));
+
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-api", "<white>API: <green>{api}</green></white>")
+                .replace("{api}", getApiVersion(target))
+        ));
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-load", "<white>Load: <green>{load}</green></white>")
+                .replace("{load}", getLoadPhase(target))
+        ));
+
+        List<String> provides = getProvides(target);
+        String providesJoined = provides.isEmpty() ? "None" : String.join(", ", provides);
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-provides", "<white>Provides: <green>{provides}</green></white>")
+                .replace("{provides}", providesJoined)
+        ));
+
+        List<String> deps = target.getDescription().getDepend();
+        List<String> soft = target.getDescription().getSoftDepend();
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-deps", "<white>Depends: <green>{deps}</green></white>")
+                .replace("{deps}", (deps != null && !deps.isEmpty()) ? String.join(", ", deps) : "None")
+        ));
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-softdeps", "<white>SoftDepends: <green>{soft}</green></white>")
+                .replace("{soft}", (soft != null && !soft.isEmpty()) ? String.join(", ", soft) : "None")
+        ));
+
+        String jarPath = getJarPath(target);
+        long jarSize = getJarSizeBytes(target);
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-jar", "<white>JAR: <green>{path}</green> <gray>({size} bytes)</gray></white>")
+                .replace("{path}", jarPath)
+                .replace("{size}", String.valueOf(Math.max(jarSize, 0)))
+        ));
+
+        File df = target.getDataFolder();
+        long dfSize = getDataFolderSizeBytes(target);
+        int dfCount = getDataFolderFileCount(target);
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-data", "<white>DataFolder: <green>{path}</green> <gray>({files} files, {size} bytes)</gray></white>")
+                .replace("{path}", (df != null ? df.getAbsolutePath() : "-") )
+                .replace("{files}", String.valueOf(dfCount))
+                .replace("{size}", String.valueOf(Math.max(dfSize, 0)))
+        ));
+
+        int listeners = getListenerCount(target);
+        int tasks = getTaskCount(target);
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-listeners-count", "<white>Listeners: <green>{count}</green></white>")
+                .replace("{count}", String.valueOf(listeners))
+        ));
+        player.sendMessage(miniMessage.deserialize(
+            plugin.getConfigManager().getValue("config.yml", "plugin-manager.info-tasks-count", "<white>Tasks: <green>{count}</green></white>")
+                .replace("{count}", String.valueOf(tasks))
+        ));
     }
     
-    /**
-     * Displays a list of plugins to a player
-     * @param player The player to show the plugin list to
-     */
     public void listPlugins(Player player) {
         List<Plugin> plugins = getPlugins();
         int enabledCount = (int) plugins.stream().filter(Plugin::isEnabled).count();

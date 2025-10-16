@@ -7,6 +7,11 @@ import de.steyon.devSystem.pluginmanager.commands.InfoCommand;
 import de.steyon.devSystem.pluginmanager.commands.ListCommand;
 import de.steyon.devSystem.pluginmanager.commands.ReloadCommand;
 import de.steyon.devSystem.pluginmanager.commands.SubCommand;
+import de.steyon.devSystem.pluginmanager.commands.TasksCommand;
+import de.steyon.devSystem.pluginmanager.commands.FilesCommand;
+import de.steyon.devSystem.pluginmanager.commands.ListenersCommand;
+import de.steyon.devSystem.pluginmanager.commands.DepsCommand;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -43,6 +48,10 @@ public class PluginManagerCommand implements CommandExecutor, TabCompleter {
         registerSubCommand(new EnableCommand(plugin, pluginManagerService));
         registerSubCommand(new DisableCommand(plugin, pluginManagerService));
         registerSubCommand(new ReloadCommand(plugin, pluginManagerService));
+        registerSubCommand(new TasksCommand(plugin, pluginManagerService));
+        registerSubCommand(new FilesCommand(plugin, pluginManagerService));
+        registerSubCommand(new ListenersCommand(plugin, pluginManagerService));
+        registerSubCommand(new DepsCommand(plugin, pluginManagerService));
     }
     
     private void registerSubCommand(SubCommand command) {
@@ -157,9 +166,13 @@ public class PluginManagerCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(miniMessage.deserialize(helpTitle));
         player.sendMessage(Component.empty());
         
+        String entryFormat = plugin.getConfigManager().getValue("config.yml", "plugin-manager.help-entry-format", "<green>/plugmanager {name}</green> <dark_gray>-</dark_gray> {description}");
         for (SubCommand subCommand : new ArrayList<>(new HashSet<>(subCommands.values()))) {
             if (player.hasPermission(subCommand.getPermission())) {
-                player.sendMessage(miniMessage.deserialize("<green>/plugmanager " + subCommand.getName() + "</green> - " + subCommand.getDescription()));
+                String line = entryFormat
+                    .replace("{name}", subCommand.getName())
+                    .replace("{description}", subCommand.getDescription());
+                player.sendMessage(miniMessage.deserialize(line));
             }
         }
     }
