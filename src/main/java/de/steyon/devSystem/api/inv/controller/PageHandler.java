@@ -65,7 +65,22 @@ public class PageHandler {
 
 
     public List<ActiveItem> getItems() {
-        return activeItems.subList(startIndex, endIndex);
+        if (activeItems == null || activeItems.isEmpty()) {
+            return List.of();
+        }
+
+        int size = activeItems.size();
+        if (startIndex >= size) {
+            page = Math.max(1, (int) Math.ceil((double) size / itemsPerPage));
+            startIndex = Math.max(0, (page - 1) * itemsPerPage);
+        }
+
+        int safeEnd = Math.min(size, startIndex + itemsPerPage);
+        endIndex = safeEnd;
+        if (startIndex >= safeEnd) {
+            return List.of();
+        }
+        return activeItems.subList(startIndex, safeEnd);
     }
 
     public void nextPage() {
@@ -95,17 +110,15 @@ public class PageHandler {
     }
 
     public int calculateEndIndex() {
-        int endIndex = page * itemsPerPage;
-        if (activeItems == null)
+        if (activeItems == null || activeItems.isEmpty()) {
             return 0;
-        if (activeItems.isEmpty())
-            return 0;
-
-        if (endIndex > activeItems.size()) {
-            endIndex = activeItems.size();
         }
-
-        return endIndex;
+        int size = activeItems.size();
+        if (startIndex >= size) {
+            page = Math.max(1, (int) Math.ceil((double) size / itemsPerPage));
+            startIndex = Math.max(0, (page - 1) * itemsPerPage);
+        }
+        return Math.min(size, startIndex + itemsPerPage);
     }
 
     public void updateIndexes() {

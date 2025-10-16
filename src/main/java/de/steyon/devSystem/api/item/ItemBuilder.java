@@ -4,6 +4,7 @@ import de.steyon.devSystem.DevSystem;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -44,7 +45,8 @@ public class ItemBuilder {
     }
 
     public ItemBuilder name(Component name) {
-        this.itemStack.editMeta(itemMeta -> itemMeta.displayName(name));
+        Component nonItalic = name.decoration(TextDecoration.ITALIC, false);
+        this.itemStack.editMeta(itemMeta -> itemMeta.displayName(nonItalic));
         return this;
     }
 
@@ -62,19 +64,28 @@ public class ItemBuilder {
     public ItemBuilder lore(String... lore) {
         List<Component> componentLore = new ArrayList<>();
         for (String s : lore) {
-            componentLore.add(LegacyComponentSerializer.legacySection().deserialize(s));
+            Component c = LegacyComponentSerializer.legacySection().deserialize(s).decoration(TextDecoration.ITALIC, false);
+            componentLore.add(c);
         }
         lore(componentLore.toArray(Component[]::new));
         return this;
     }
 
     public ItemBuilder lore(Component... lore) {
-        this.itemStack.editMeta(itemMeta -> itemMeta.lore(List.of(lore)));
+        List<Component> nonItalicLore = new ArrayList<>();
+        for (Component c : lore) {
+            nonItalicLore.add(c.decoration(TextDecoration.ITALIC, false));
+        }
+        this.itemStack.editMeta(itemMeta -> itemMeta.lore(nonItalicLore));
         return this;
     }
 
     public ItemBuilder lore(List<Component> components){
-        this.itemStack.editMeta(itemMeta -> itemMeta.lore(components));
+        List<Component> nonItalicLore = new ArrayList<>();
+        for (Component c : components) {
+            nonItalicLore.add(c.decoration(TextDecoration.ITALIC, false));
+        }
+        this.itemStack.editMeta(itemMeta -> itemMeta.lore(nonItalicLore));
         return this;
     }
 
@@ -98,7 +109,8 @@ public class ItemBuilder {
     public List<ItemBuilder> setSkullTexture(String texture, DevSystem devSystem, int amount) {
         List<ItemBuilder> itemBuilders = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
-            ItemMeta itemMeta = this.itemStack.getItemMeta();
+            ItemStack clone = this.itemStack.clone();
+            ItemMeta itemMeta = clone.getItemMeta();
             SkullMeta skullMeta = (SkullMeta) itemMeta;
             com.destroystokyo.paper.profile.PlayerProfile profile = devSystem.getServer().createProfile(UUID.randomUUID());
             PlayerTextures textures = profile.getTextures();
@@ -108,9 +120,9 @@ public class ItemBuilder {
                 throw new RuntimeException(e);
             }
             profile.setTextures(textures);
-            skullMeta.setPlayerProfile(skullMeta.getPlayerProfile());
-            this.itemStack.setItemMeta(skullMeta);
-            itemBuilders.add(this);
+            skullMeta.setPlayerProfile(profile);
+            clone.setItemMeta(skullMeta);
+            itemBuilders.add(new ItemBuilder(clone));
         }
         return itemBuilders;
     }
@@ -171,7 +183,7 @@ public class ItemBuilder {
         if (lore == null) {
             lore = new ArrayList<>();
         }
-        lore.add(deserialize);
+        lore.add(deserialize.decoration(TextDecoration.ITALIC, false));
         itemMeta.lore(lore);
         itemStack.setItemMeta(itemMeta);
         return this;

@@ -29,7 +29,7 @@ public class SteyOnInv {
     @Getter
     private final Component title;
     public Consumer<InventoryOpenEvent> openAction;
-    private InventoryEventListener listener;
+    private static InventoryEventListener listener;
     @Getter
     public Consumer<InventoryCloseEvent> closeAction;
     @Getter
@@ -45,9 +45,7 @@ public class SteyOnInv {
         this.inventory = this.mainClass.getServer().createInventory(player, size, title);
         if (listener == null) {
             listener = new InventoryEventListener();
-            listener.registerInventory(this);
             this.mainClass.getServer().getPluginManager().registerEvents(listener, mainClass);
-            return;
         }
         listener.registerInventory(this);
     }
@@ -68,17 +66,12 @@ public class SteyOnInv {
         return this;
     }
 
-
     public void removeItem(int slot) {
         activeItems.removeIf(item -> item.getItemStack().equals(inventory.getItem(slot)));
     }
 
     public void open(Player player) {
         player.openInventory(inventory);
-        if (openAction != null) {
-            InventoryOpenEvent openEvent = new InventoryOpenEvent(player.getOpenInventory());
-            openAction.accept(openEvent);
-        }
     }
 
     public void setItem(int slot, ActiveItem activeItem) {

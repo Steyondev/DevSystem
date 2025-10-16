@@ -68,6 +68,13 @@ plugin-manager:
   disable-text: "<red>Plugin deaktivieren</red>"
   disable-lore: "<dark_gray>» <gray>Click to disable this plugin"
   
+  # Confirmation dialog texts
+  confirm-reload: "<yellow><bold>Confirm:</bold></yellow> <gray>Reload</gray> <aqua>{plugin}</aqua><gray>?</gray>"
+  confirm-enable: "<green><bold>Confirm:</bold></green> <gray>Enable</gray> <aqua>{plugin}</aqua><gray>?</gray>"
+  confirm-disable: "<red><bold>Confirm:</bold></red> <gray>Disable</gray> <aqua>{plugin}</aqua><gray>?</gray>"
+  confirm-yes: "<green><bold>Yes</bold></green>"
+  confirm-no: "<red><bold>No</bold></red>"
+  
   # Plugin Manager messages
   plugin-enabled: "<prefix><gray>The Plugin </gray><aqua>{plugin}</aqua><gray> has been </gray><green>enabled<dark_gray>!"
   plugin-disabled: "<prefix><gray>The Plugin </gray><aqua>{plugin}</aqua><gray> has been </gray><red>disabled<dark_gray>!"

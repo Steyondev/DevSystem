@@ -1,7 +1,6 @@
 package de.steyon.devSystem.api.inv.controller;
 
 import de.steyon.devSystem.api.inv.SteyOnInv;
-import de.steyon.devSystem.api.inv.SteyOnInv;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;

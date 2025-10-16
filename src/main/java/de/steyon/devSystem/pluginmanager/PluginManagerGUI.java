@@ -185,7 +185,7 @@ public class PluginManagerGUI {
         
         String[] pattern = {
             "XXXXXXXXX",
-            "XXX I XXX",
+            "XXXXIXXXX",
             "XXRXDXEXX",
             "XXXXXXXXB",
         };
@@ -310,7 +310,6 @@ public class PluginManagerGUI {
         ItemBuilder borderBuilder = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
             .name(Component.empty())
             .clearAllAttributes();
-            
         ActiveItem borderItem = new ActiveItem(borderBuilder.build())
             .click(e -> e.setCancelled(true));
             
@@ -325,10 +324,18 @@ public class PluginManagerGUI {
         ActiveItem reloadItem = new ActiveItem(reloadBuilder.build())
             .click(e -> {
                 e.setCancelled(true);
-                service.reloadPlugin(targetPlugin, player);
-                openPluginDetailsGUI(player, targetPlugin);
+                if (player.hasPermission("devsystem.pluginmanager.reload")) {
+                    openConfirmGUI(player,
+                        plugin.getConfigManager().getValue("config.yml", "plugin-manager.confirm-reload", "<yellow>Reload {plugin}?</yellow>").replace("{plugin}", targetPlugin.getName()),
+                        () -> {
+                            service.reloadPlugin(targetPlugin, player);
+                            openPluginDetailsGUI(player, targetPlugin);
+                        },
+                        () -> openPluginDetailsGUI(player, targetPlugin)
+                    );
+                }
             });
-            
+
         String enableText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.enable-text", "<green>Enable Plugin</green>");
         String enableLoreText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.enable-lore", "<dark_gray>Click to enable this plugin</dark_gray>");
         
@@ -340,10 +347,18 @@ public class PluginManagerGUI {
         ActiveItem enableItem = new ActiveItem(enableBuilder.build())
             .click(e -> {
                 e.setCancelled(true);
-                service.enablePlugin(targetPlugin, player);
-                openPluginDetailsGUI(player, targetPlugin);
+                if (player.hasPermission("devsystem.pluginmanager.enable")) {
+                    openConfirmGUI(player,
+                        plugin.getConfigManager().getValue("config.yml", "plugin-manager.confirm-enable", "<green>Enable {plugin}?</green>").replace("{plugin}", targetPlugin.getName()),
+                        () -> {
+                            service.enablePlugin(targetPlugin, player);
+                            openPluginDetailsGUI(player, targetPlugin);
+                        },
+                        () -> openPluginDetailsGUI(player, targetPlugin)
+                    );
+                }
             });
-            
+
         String disableText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.disable-text", "<red>Disable Plugin</red>");
         String disableLoreText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.disable-lore", "<dark_gray>Click to disable this plugin</dark_gray>");
         
@@ -355,10 +370,18 @@ public class PluginManagerGUI {
         ActiveItem disableItem = new ActiveItem(disableBuilder.build())
             .click(e -> {
                 e.setCancelled(true);
-                service.disablePlugin(targetPlugin, player);
-                openPluginDetailsGUI(player, targetPlugin);
+                if (player.hasPermission("devsystem.pluginmanager.disable")) {
+                    openConfirmGUI(player,
+                        plugin.getConfigManager().getValue("config.yml", "plugin-manager.confirm-disable", "<red>Disable {plugin}?</red>").replace("{plugin}", targetPlugin.getName()),
+                        () -> {
+                            service.disablePlugin(targetPlugin, player);
+                            openPluginDetailsGUI(player, targetPlugin);
+                        },
+                        () -> openPluginDetailsGUI(player, targetPlugin)
+                    );
+                }
             });
-            
+
         String backText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.back-text", "<blue>Back to Plugin List</blue>");
         
         ItemBuilder backBuilder = new ItemBuilder(Material.ARROW)
@@ -374,18 +397,63 @@ public class PluginManagerGUI {
         HashMap<Character, ActiveItem> items = new HashMap<>();
         items.put('X', borderItem);
         items.put('I', infoItem);
-        items.put('R', reloadItem);
+        // Permissions
+        boolean canReload = player.hasPermission("devsystem.pluginmanager.reload");
+        boolean canEnable = player.hasPermission("devsystem.pluginmanager.enable");
+        boolean canDisable = player.hasPermission("devsystem.pluginmanager.disable");
+
+        items.put('R', canReload ? reloadItem : borderItem);
         items.put('B', backItem);
-        
+
         if (targetPlugin.isEnabled()) {
-            items.put('D', disableItem);
-            items.put('E', new ActiveItem(new ItemBuilder(Material.BARRIER).name(Component.empty()).build()).click(e -> e.setCancelled(true)));
+            items.put('D', canDisable ? disableItem : borderItem);
+            items.put('E', borderItem);
         } else {
-            items.put('E', enableItem);
-            items.put('D', new ActiveItem(new ItemBuilder(Material.BARRIER).name(Component.empty()).build()).click(e -> e.setCancelled(true)));
+            items.put('E', canEnable ? enableItem : borderItem);
+            items.put('D', borderItem);
         }
-        
+
         gui.setUnActiveItems(items);
         gui.open(player);
     }
-} 
+
+    private void openConfirmGUI(Player player, String titleMiniMsg, Runnable onConfirm, Runnable onCancel) {
+        Component title = miniMessage.deserialize(titleMiniMsg);
+        String[] pattern = {
+            "XXXXXXXXX",
+            "XXYXXXNXX",
+            "XXXXXXXXX",
+        };
+
+        SteyOnInv gui = new SteyOnInv(plugin, 9 * 3, title, player, pattern);
+
+        ItemBuilder borderBuilder = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
+            .name(Component.empty())
+            .clearAllAttributes();
+        ActiveItem border = new ActiveItem(borderBuilder.build()).click(e -> e.setCancelled(true));
+
+        ItemBuilder yesBuilder = new ItemBuilder(Material.LIME_WOOL)
+            .name(miniMessage.deserialize(plugin.getConfigManager().getValue("config.yml", "plugin-manager.confirm-yes", "<green>Yes</green>")))
+            .clearAllAttributes();
+        ActiveItem yes = new ActiveItem(yesBuilder.build()).click(e -> {
+            e.setCancelled(true);
+            if (onConfirm != null) onConfirm.run();
+        });
+
+        ItemBuilder noBuilder = new ItemBuilder(Material.RED_WOOL)
+            .name(miniMessage.deserialize(plugin.getConfigManager().getValue("config.yml", "plugin-manager.confirm-no", "<red>No</red>")))
+            .clearAllAttributes();
+        ActiveItem no = new ActiveItem(noBuilder.build()).click(e -> {
+            e.setCancelled(true);
+            if (onCancel != null) onCancel.run();
+        });
+
+        HashMap<Character, ActiveItem> items = new HashMap<>();
+        items.put('X', border);
+        items.put('Y', yes);
+        items.put('N', no);
+
+        gui.setUnActiveItems(items);
+        gui.open(player);
+    }
+}

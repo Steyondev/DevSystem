@@ -17,9 +17,9 @@ public class FileManager {
     }
 
 
-    public void createFile(String path, String content) {
+    public void createFile(String path, String fileName) {
         try {
-            new File(path, content).createNewFile();
+            new File(path, fileName).createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -31,7 +31,7 @@ public class FileManager {
             if (folder.delete()) {
                 player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-deleted", folder.getName()));
             } else {
-                player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-delete-failed", folder.getName()));
+                player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-delete-fail", folder.getName()));
             }
         } else {
             player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-not-exist", folder.getName()));
@@ -44,7 +44,7 @@ public class FileManager {
             if (file.delete()) {
                 player.sendMessage(devSystem.getConfigManager().getMessage("error", "file-deleted", fileName));
             } else {
-                player.sendMessage(devSystem.getConfigManager().getMessage("error", "file-delete-failed", fileName));
+                player.sendMessage(devSystem.getConfigManager().getMessage("error", "file-delete-fail", fileName));
             }
         } else {
             player.sendMessage(devSystem.getConfigManager().getMessage("error", "file-not-exist", fileName));
@@ -57,7 +57,7 @@ public class FileManager {
             if (folder.delete()) {
                 player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-deleted", folderName));
             } else {
-                player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-delete-failed", folderName));
+                player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-delete-fail", folderName));
             }
         } else {
             player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-not-exist", folderName));
@@ -74,10 +74,10 @@ public class FileManager {
             if (folder.mkdirs()) {
                 player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-created", folderName));
             } else {
-                player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-create-failed", folderName));
+                player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-create-fail", folderName));
             }
         } else {
-            player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-exist", folderName));
+            player.sendMessage(devSystem.getConfigManager().getMessage("error", "folder-exists", folderName));
         }
     }
 

@@ -1,9 +1,10 @@
 name: DevSystem
-version: '1.0'
+version: ${version}
 main: de.steyon.devSystem.DevSystem
 authors: [ SteyOn ]
 description: Official SteyOn Developer System for Minecraft Servers
 website: https://github.com/SteyOn
+api-version: '1.21'
 
 commands:
   plugmanager:
@@ -11,8 +12,35 @@ commands:
     usage: /plugmanager
     aliases: [pm, plugman]
     permission: devsystem.pluginmanager
+    permission-message: "You don't have permission to use this command."
 
 permissions:
   devsystem.pluginmanager:
     description: Allows using the plugin manager
+    default: op
+    children:
+      devsystem.pluginmanager.list: true
+      devsystem.pluginmanager.info: true
+      devsystem.pluginmanager.enable: false
+      devsystem.pluginmanager.disable: false
+      devsystem.pluginmanager.reload: false
+
+  devsystem.pluginmanager.list:
+    description: Allows listing all plugins
+    default: true
+
+  devsystem.pluginmanager.info:
+    description: Allows viewing plugin information
+    default: true
+
+  devsystem.pluginmanager.enable:
+    description: Allows enabling plugins
+    default: op
+
+  devsystem.pluginmanager.disable:
+    description: Allows disabling plugins
+    default: op
+
+  devsystem.pluginmanager.reload:
+    description: Allows reloading plugins
     default: op
