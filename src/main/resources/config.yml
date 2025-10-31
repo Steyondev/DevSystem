@@ -45,17 +45,17 @@ messages:
 # Plugin Manager Settings
 plugin-manager:
   # GUI titles
-  main-gui-title: "<aqua><bold>Plugins</bold> <dark_gray>• Übersicht"
+  main-gui-title: "<aqua><bold>Plugins</bold> <dark_gray>• Overview"
   details-gui-title: "<aqua><bold>Plugin</bold> <dark_gray>• {plugin}"
   help-title: "<aqua><bold>Plugin Manager Help</bold>"
-  help-entry-format: "<green>/plugmanager {name}</green> <dark_gray>-</dark_gray> {description}"
+  help-entry-format: "<green>/plugmanager {name}</green> {description}"
   
   # Plugin items in GUI
   plugin-name: "<aqua>{plugin}"
   plugin-version: "<dark_gray>➥<gray> Version<dark_gray>: <green>{version}</green>"
   plugin-author: "<dark_gray>➥<gray> Author<dark_gray>: <green>{author}</green>"
   plugin-description: "<dark_gray>➥<gray> Description<dark_gray>: <green>{description}</green>"
-  plugin-status: "<dark_gray>| <gray>Status<dark_gray>: {status}"
+  plugin-status: "<dark_gray>➥<gray> Status<dark_gray>: {status}"
   status-enabled: "<green>Enabled</green>"
   status-disabled: "<red>Disabled</red>"
   click-to-manage: "<dark_gray>» <gray>Click to manage this plugin"
@@ -118,6 +118,7 @@ plugin-manager:
     files: "<dark_gray>» <gray>Shows data folder and JAR info for a plugin"
     listeners: "<dark_gray>» <gray>Shows registered listeners for a plugin"
     deps: "<dark_gray>» <gray>Shows dependencies and dependents for a plugin"
+    load: "<dark_gray>» <gray>Loads a plugin JAR at runtime (path or URL)"
   
   # Command usage messages
   command-usage:
@@ -129,6 +130,7 @@ plugin-manager:
     files: "<dark_gray>» <gray>/plugmanager files <blue><plugin>"
     listeners: "<dark_gray>» <gray>/plugmanager listeners <blue><plugin>"
     deps: "<dark_gray>» <gray>/plugmanager deps <blue><plugin>"
+    load: "<dark_gray>» <gray>/plugmanager load <blue><path-or-url> [sources...]"
   
   # Info command
   info-header: "<aqua><bold>Plugin Information</bold><dark_gray>: {plugin}"
@@ -177,3 +179,7 @@ plugin-manager:
     reload-timeout-seconds: 10
     block-disable-with-dependents: true
     smart-reload: true
+    load-allow-url: true
+    load-allow-local: true
+    load-block-missing-deps: true
+    load-gui-button-enabled: true

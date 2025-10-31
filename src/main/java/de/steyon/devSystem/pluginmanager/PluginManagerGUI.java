@@ -50,8 +50,11 @@ public class PluginManagerGUI {
         int itemsPerPage = 28;
         int totalPages = (int) Math.ceil((double) pluginItems.size() / itemsPerPage);
         
+        boolean showLoadButton = plugin.getConfigManager().getValue("config.yml", "plugin-manager.settings.load-gui-button-enabled", true);
         if (totalPages > 1) {
-            pattern[5] = "XXX<X>XXX";
+            pattern[5] = showLoadButton ? "XXX<X>XXL" : "XXX<X>XXX";
+        } else {
+            if (showLoadButton) pattern[5] = "XXXXXXXXL";
         }
         
         SteyOnInv gui = new SteyOnInv(plugin, 9 * 6, titleComponent, player, pattern);
@@ -83,6 +86,35 @@ public class PluginManagerGUI {
             
             staticItems.put('<', prevPage);
             staticItems.put('>', nextPage);
+        }
+
+        if (showLoadButton) {
+            String loadText = plugin.getConfigManager().getValue("config.yml", "plugin-manager.load-button-text", "<yellow>Load Plugin</yellow>");
+            String loadLore = plugin.getConfigManager().getValue("config.yml", "plugin-manager.load-button-lore", "<dark_gray>» <gray>Click to see command usage");
+
+            ItemBuilder loadBuilder = new ItemBuilder(Material.CHEST)
+                .name(miniMessage.deserialize(loadText))
+                .lore(miniMessage.deserialize(loadLore))
+                .clearAllAttributes();
+
+            ActiveItem loadItem = new ActiveItem(loadBuilder.build())
+                .click(e -> {
+                    e.setCancelled(true);
+                    if (!((Player) e.getWhoClicked()).hasPermission("devsystem.pluginmanager.load")) {
+                        ((Player) e.getWhoClicked()).sendMessage(
+                            plugin.getConfigManager().getMessage(
+                                plugin.getConfigManager().getValue("config.yml", "messages.no-permission", "<prefix><red>You don't have permission to use this command!</red>")
+                            )
+                        );
+                        return;
+                    }
+                    String loadTitle = plugin.getConfigManager().getValue("config.yml", "plugin-manager.load-help-title", "<aqua><bold>Load Plugin</bold>");
+                    String usage = plugin.getConfigManager().getValue("config.yml", "plugin-manager.load-help-usage", "<dark_gray>» <gray>/plugmanager load <blue><path-or-url>");
+                    ((Player) e.getWhoClicked()).sendMessage(miniMessage.deserialize(loadTitle));
+                    ((Player) e.getWhoClicked()).sendMessage(miniMessage.deserialize(usage));
+                });
+
+            staticItems.put('L', loadItem);
         }
         
         gui.setUnActiveItems(staticItems);
@@ -155,6 +187,7 @@ public class PluginManagerGUI {
                 .lore(
                     miniMessage.deserialize(versionText),
                     miniMessage.deserialize(statusText),
+                    Component.empty(),
                     miniMessage.deserialize(clickText)
                 )
                 .clearAllAttributes();

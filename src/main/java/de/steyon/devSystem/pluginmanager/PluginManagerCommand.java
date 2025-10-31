@@ -6,6 +6,7 @@ import de.steyon.devSystem.pluginmanager.commands.EnableCommand;
 import de.steyon.devSystem.pluginmanager.commands.InfoCommand;
 import de.steyon.devSystem.pluginmanager.commands.ListCommand;
 import de.steyon.devSystem.pluginmanager.commands.ReloadCommand;
+import de.steyon.devSystem.pluginmanager.commands.LoadCommand;
 import de.steyon.devSystem.pluginmanager.commands.SubCommand;
 import de.steyon.devSystem.pluginmanager.commands.TasksCommand;
 import de.steyon.devSystem.pluginmanager.commands.FilesCommand;
@@ -52,6 +53,7 @@ public class PluginManagerCommand implements CommandExecutor, TabCompleter {
         registerSubCommand(new FilesCommand(plugin, pluginManagerService));
         registerSubCommand(new ListenersCommand(plugin, pluginManagerService));
         registerSubCommand(new DepsCommand(plugin, pluginManagerService));
+        registerSubCommand(new LoadCommand(plugin, pluginManagerService));
     }
     
     private void registerSubCommand(SubCommand command) {

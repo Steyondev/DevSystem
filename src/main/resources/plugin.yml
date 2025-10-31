@@ -24,6 +24,7 @@ permissions:
       devsystem.pluginmanager.enable: false
       devsystem.pluginmanager.disable: false
       devsystem.pluginmanager.reload: false
+      devsystem.pluginmanager.load: false
 
   devsystem.pluginmanager.list:
     description: Allows listing all plugins
@@ -43,4 +44,8 @@ permissions:
 
   devsystem.pluginmanager.reload:
     description: Allows reloading plugins
+    default: op
+
+  devsystem.pluginmanager.load:
+    description: Allows loading plugins from JAR at runtime
     default: op

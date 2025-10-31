@@ -53,6 +53,90 @@ public class PluginManagerService {
         return null;
     }
 
+    /**
+     * Loads a plugin JAR at runtime and enables it.
+     * Accepts a File pointing to a .jar inside the plugins folder.
+     * Returns the loaded Plugin instance or null if failed.
+     */
+    public Plugin loadPluginFromJar(File jar, Player player) {
+        try {
+            if (jar == null || !jar.exists() || !jar.isFile() || !jar.getName().toLowerCase().endsWith(".jar")) {
+                if (player != null) {
+                    player.sendMessage(miniMessage.deserialize(
+                        plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-not-found",
+                            "<prefix><red>Plugin not found</red><dark_gray>: {plugin}")
+                            .replace("{plugin}", jar != null ? jar.getName() : "-")
+                    ));
+                }
+                return null;
+            }
+
+            // Try to call loadPlugin(File) reflectively (SimplePluginManager provides it)
+            Plugin loaded = null;
+            try {
+                java.lang.reflect.Method m = pluginManager.getClass().getMethod("loadPlugin", File.class);
+                Object obj = m.invoke(pluginManager, jar);
+                if (obj instanceof Plugin) loaded = (Plugin) obj;
+            } catch (NoSuchMethodException ignore) {
+                // Fallback: try calling on SimplePluginManager class directly if available
+                try {
+                    Class<?> spm = Class.forName("org.bukkit.plugin.SimplePluginManager");
+                    if (spm.isInstance(pluginManager)) {
+                        java.lang.reflect.Method m = spm.getDeclaredMethod("loadPlugin", File.class);
+                        m.setAccessible(true);
+                        Object obj = m.invoke(pluginManager, jar);
+                        if (obj instanceof Plugin) loaded = (Plugin) obj;
+                    }
+                } catch (Throwable ignored) {}
+            }
+
+            if (loaded == null) {
+                if (player != null) {
+                    player.sendMessage(miniMessage.deserialize(
+                        plugin.getConfigManager().getValue("config.yml", "plugin-manager.load-failed",
+                            "<prefix><red>Failed to load plugin</red><dark_gray>: </dark_gray><aqua>{plugin}</aqua>")
+                            .replace("{plugin}", jar.getName())
+                    ));
+                }
+                return null;
+            }
+
+            // If a plugin with same name is already enabled, abort
+            Plugin existing = getPlugin(loaded.getName());
+            if (existing != null && existing != loaded) {
+                if (player != null) {
+                    player.sendMessage(miniMessage.deserialize(
+                        plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-already-enabled",
+                            "<prefix><red>Plugin is already enabled</red><dark_gray>: {plugin}</dark_gray></red>")
+                            .replace("{plugin}", existing.getName())
+                    ));
+                }
+                return null;
+            }
+
+            // Enable
+            pluginManager.enablePlugin(loaded);
+
+            if (player != null) {
+                player.sendMessage(miniMessage.deserialize(
+                    plugin.getConfigManager().getValue("config.yml", "plugin-manager.plugin-enabled",
+                        "<prefix><white>Plugin <green>{plugin}</green> has been enabled!</white>")
+                        .replace("{plugin}", loaded.getName())
+                ));
+            }
+            return loaded;
+        } catch (Throwable t) {
+            if (player != null) {
+                player.sendMessage(miniMessage.deserialize(
+                    plugin.getConfigManager().getValue("config.yml", "plugin-manager.load-exception",
+                        "<prefix><red>Exception while loading plugin</red><dark_gray>: </dark_gray><aqua>{plugin}</aqua>")
+                        .replace("{plugin}", jar != null ? jar.getName() : "-")
+                ));
+            }
+            return null;
+        }
+    }
+
     public String getApiVersion(Plugin p) {
         try {
             String v = p.getDescription().getAPIVersion();
