@@ -470,7 +470,6 @@ public class PluginManagerGUI {
         HashMap<Character, ActiveItem> items = new HashMap<>();
         items.put('X', borderItem);
         items.put('I', infoItem);
-        // Permissions
         boolean canReload = player.hasPermission("devsystem.pluginmanager.reload");
         boolean canEnable = player.hasPermission("devsystem.pluginmanager.enable");
         boolean canDisable = player.hasPermission("devsystem.pluginmanager.disable");

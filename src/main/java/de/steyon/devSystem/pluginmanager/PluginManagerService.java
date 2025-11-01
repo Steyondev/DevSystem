@@ -53,11 +53,6 @@ public class PluginManagerService {
         return null;
     }
 
-    /**
-     * Loads a plugin JAR at runtime and enables it.
-     * Accepts a File pointing to a .jar inside the plugins folder.
-     * Returns the loaded Plugin instance or null if failed.
-     */
     public Plugin loadPluginFromJar(File jar, Player player) {
         try {
             if (jar == null || !jar.exists() || !jar.isFile() || !jar.getName().toLowerCase().endsWith(".jar")) {
@@ -71,14 +66,12 @@ public class PluginManagerService {
                 return null;
             }
 
-            // Try to call loadPlugin(File) reflectively (SimplePluginManager provides it)
             Plugin loaded = null;
             try {
                 java.lang.reflect.Method m = pluginManager.getClass().getMethod("loadPlugin", File.class);
                 Object obj = m.invoke(pluginManager, jar);
                 if (obj instanceof Plugin) loaded = (Plugin) obj;
             } catch (NoSuchMethodException ignore) {
-                // Fallback: try calling on SimplePluginManager class directly if available
                 try {
                     Class<?> spm = Class.forName("org.bukkit.plugin.SimplePluginManager");
                     if (spm.isInstance(pluginManager)) {
@@ -101,7 +94,6 @@ public class PluginManagerService {
                 return null;
             }
 
-            // If a plugin with same name is already enabled, abort
             Plugin existing = getPlugin(loaded.getName());
             if (existing != null && existing != loaded) {
                 if (player != null) {
@@ -114,7 +106,6 @@ public class PluginManagerService {
                 return null;
             }
 
-            // Enable
             pluginManager.enablePlugin(loaded);
 
             if (player != null) {

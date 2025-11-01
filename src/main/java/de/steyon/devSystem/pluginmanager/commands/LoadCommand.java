@@ -82,7 +82,6 @@ public class LoadCommand implements SubCommand {
                     ));
                     return;
                 }
-                // Download to plugins folder
                 String name = "downloaded-" + System.currentTimeMillis() + ".jar";
                 jar = new File(pluginsDir, name);
                 downloadToFile(source, jar.toPath());
@@ -93,7 +92,6 @@ public class LoadCommand implements SubCommand {
                     ));
                     return;
                 }
-                // Interpret as local path (relative to plugins folder if not absolute)
                 File candidate = new File(source);
                 if (!candidate.isAbsolute()) {
                     candidate = new File(pluginsDir, source);
@@ -109,16 +107,13 @@ public class LoadCommand implements SubCommand {
                 return;
             }
 
-            // Ensure file is in plugins dir (some servers require this)
             if (!jar.getParentFile().equals(pluginsDir)) {
                 File moved = new File(pluginsDir, jar.getName());
                 Files.copy(jar.toPath(), moved.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 jar = moved;
             }
 
-            // Prepare additional sources (for auto-resolve)
             Map<String, File> candidateByName = new HashMap<>();
-            // include main jar's meta
             String mainName = safeGetPluginName(jar);
             if (mainName != null) candidateByName.put(mainName.toLowerCase(), jar);
 
@@ -143,10 +138,8 @@ public class LoadCommand implements SubCommand {
                 }
             }
 
-            // Resolve hard depends order (load dependencies first)
             List<File> loadOrder = resolveLoadOrder(jar, candidateByName);
 
-            // If blocking missing deps and some cannot be resolved, abort
             if (blockMissingDeps) {
                 List<String> missing = getMissingDependenciesConsideringCandidates(jar, candidateByName);
                 if (!missing.isEmpty()) {
@@ -159,10 +152,9 @@ public class LoadCommand implements SubCommand {
                 }
             }
 
-            // Load in order, skipping those already installed/enabled
             for (File f : loadOrder) {
                 String n = safeGetPluginName(f);
-                if (n != null && hasPlugin(n)) continue; // already installed
+                if (n != null && hasPlugin(n)) continue;
                 service.loadPluginFromJar(f, player);
             }
 
@@ -185,7 +177,6 @@ public class LoadCommand implements SubCommand {
     public List<String> tabComplete(Player player, String[] args) {
         List<String> list = new ArrayList<>();
         if (args.length == 1) {
-            // Suggest local .jar files in plugins directory
             File pluginsDir = plugin.getDataFolder().getParentFile();
             if (pluginsDir == null) pluginsDir = new File("plugins");
             File[] files = pluginsDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".jar"));
@@ -253,9 +244,8 @@ public class LoadCommand implements SubCommand {
         if (name == null) return;
         String key = name.toLowerCase();
         if (visited.contains(key)) return;
-        if (visiting.contains(key)) return; // cycle guard
+        if (visiting.contains(key)) return;
         visiting.add(key);
-        // add deps first
         for (String dep : getDependsList(jar)) {
             if (hasPlugin(dep)) continue;
             File depJar = candidates.get(dep.toLowerCase());
