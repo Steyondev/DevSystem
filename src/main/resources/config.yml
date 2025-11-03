@@ -83,9 +83,9 @@ plugin-manager:
   # Action buttons
   reload-text: "<yellow>Reload Plugin</yellow>"
   reload-lore: "<dark_gray>» <gray>Click to reload this plugin"
-  enable-text: "<green>Plugin aktivieren</green>"
+  enable-text: "<green>Enable Plugin</green>"
   enable-lore: "<dark_gray>» <gray>Click to enable this plugin"
-  disable-text: "<red>Plugin deaktivieren</red>"
+  disable-text: "<red>Disable Plugin</red>"
   disable-lore: "<dark_gray>» <gray>Click to disable this plugin"
   
   # Confirmation dialog texts

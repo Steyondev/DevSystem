@@ -17,12 +17,10 @@ public final class DevSystem extends JavaPlugin {
 
     @Getter
     private InventoryManager inventoryManager;
-    
     @Getter
     private Config configManager;
     @Getter
     private MiniMessage miniMessage;
-    
     @Getter
     private PluginManagerService pluginManagerService;
 
@@ -43,7 +41,7 @@ public final class DevSystem extends JavaPlugin {
         
         getServer().getConsoleSender().sendMessage(this.configManager.getPluginMessage("enabled"));
     }
-    
+
     private void registerCommands() {
         PluginManagerCommand pluginManagerCommand = new PluginManagerCommand(this, this.pluginManagerService);
         getCommand("plugmanager").setExecutor(pluginManagerCommand);
