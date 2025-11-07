@@ -398,6 +398,15 @@ public class PluginManagerGUI {
             .click(e -> {
                 e.setCancelled(true);
                 if (player.hasPermission("devsystem.pluginmanager.reload")) {
+                    // Prevent reloading the core DevSystem plugin to avoid breaking the system
+                    if (targetPlugin.getName().equalsIgnoreCase(plugin.getName())) {
+                        player.sendMessage(miniMessage.deserialize(
+                            plugin.getConfigManager().getValue("config.yml", "plugin-manager.cannot-reload-core",
+                            "<prefix><red>Cannot reload core system plugin</red><dark_gray>: </dark_gray><aqua>{plugin}</aqua>")
+                                .replace("{plugin}", targetPlugin.getName())
+                        ));
+                        return;
+                    }
                     openConfirmGUI(player,
                         plugin.getConfigManager().getValue("config.yml", "plugin-manager.confirm-reload", "<yellow>Reload {plugin}?</yellow>").replace("{plugin}", targetPlugin.getName()),
                         () -> {

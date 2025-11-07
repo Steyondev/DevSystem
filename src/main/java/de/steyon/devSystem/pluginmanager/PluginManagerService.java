@@ -337,6 +337,17 @@ public class PluginManagerService {
             }
             return false;
         }
+        // Prevent reloading the core DevSystem plugin to avoid breaking the system
+        if (target.getName().equalsIgnoreCase(plugin.getName())) {
+            if (player != null) {
+                player.sendMessage(miniMessage.deserialize(
+                    plugin.getConfigManager().getValue("config.yml", "plugin-manager.cannot-reload-core", 
+                    "<prefix><red>Cannot reload core system plugin</red><dark_gray>: </dark_gray><aqua>{plugin}</aqua>")
+                        .replace("{plugin}", target.getName())
+                ));
+            }
+            return false;
+        }
         boolean smartReload = plugin.getConfigManager().getValue("config.yml", "plugin-manager.settings.smart-reload", true);
         if (!smartReload) {
             pluginManager.disablePlugin(target);

@@ -106,6 +106,7 @@ plugin-manager:
   plugin-not-found: "<prefix><red>Plugin not found<dark_gray>: {plugin}</red>"
   cannot-disable-has-dependents: "<prefix><red>Cannot disable {plugin}, dependents<dark_gray>: </dark_gray><aqua>{dependents}</aqua>"
   cannot-disable-core: "<prefix><red>Cannot disable core system plugin</red><dark_gray>: </dark_gray><aqua>{plugin}</aqua>"
+  cannot-reload-core: "<prefix><red>Cannot reload core system plugin</red><dark_gray>: </dark_gray><aqua>{plugin}</aqua>"
   
   # Command help messages
   command-help:
