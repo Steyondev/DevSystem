@@ -5,6 +5,7 @@ authors: [ SteyOn ]
 description: Official SteyOn Developer System for Minecraft Servers
 website: https://github.com/SteyOn
 api-version: '1.21'
+folia-supported: true
 
 commands:
   plugmanager:
